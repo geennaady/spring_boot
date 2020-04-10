@@ -1,0 +1,77 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List all user</title>
+</head>
+<style>
+    #grid {
+        display: grid;
+        grid-template-rows: repeat(8, 1fr);
+        grid-template-columns: repeat(8, 1fr);
+        grid-gap: 5px;
+    }
+    .user {
+        font-family: Arial;
+        font-size: 18px;
+        padding: .5em;
+        background: gold;
+        text-align: center;
+    }
+    button, .butt {
+        font-family: Arial;
+        background-color: darkorange;
+        border: none;
+        color: black;
+        padding: 5px 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+    }
+    a {
+        font-family: Arial;
+        background-color: orange;
+        text-decoration: none;
+        font-size: 24px;
+    }
+</style>
+<body>
+    <a href="/logout">Logout</a>
+    <div id="grid">
+        <th:block th:each="user : ${users}">
+            <span class="user">
+                <p>Id: <th:block th:text="${user.getId()}" /></p>
+                <p>Name: <th:block th:text="${user.getUsername()}" /></p>
+                <p>Password: <th:block th:text="${user.getPassword()}" /></p>
+
+                <form action="#" th:action="@{/admin/delete}" method="post">
+                    <input type="hidden" name="id" th:value="${user.getId()}">
+                    <input class="butt" type="submit" th:value="Delete">
+                </form>
+
+                <form action="#" th:action="@{/admin/update}" method="get">
+                    <input type="hidden" name="id" th:value="${user.getId()}">
+                    <input type="hidden" name="name" th:value="${user.getUsername()}">
+                    <input type="hidden" name="pass" th:value="${user.getPassword()}">
+                    <input class="butt" type="submit" value="Change">
+                </form>
+            </span>
+        </th:block>
+
+        <span class="user">
+            <form action="#" th:action="@{/admin/add}" th:object="${user}" method="post">
+                <span>
+                    <p>New User</p>
+                    <p>Name: <input type="text" th:field="*{username}"/></p>
+                    <br>
+                    <p>Password: <input type="text" th:field="*{password}"/></p>
+                    <br>
+                    <button type="submit">Add me</button>
+                </span>
+            </form>
+        </span>
+    </div>
+</body>
+</html>
