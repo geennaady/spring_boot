@@ -44,7 +44,9 @@
             <span class="user">
                 <p>Id: <th:block th:text="${user.getId()}" /></p>
                 <p>Name: <th:block th:text="${user.getUsername()}" /></p>
-                <p>Password: <th:block th:text="${user.getPassword()}" /></p>
+                <p>Role: <th:block th:each="role : ${user.getAllRoles()}">
+                    <th:block th:text="${role}"/>
+                </th:block></p>
 
                 <form action="#" th:action="@{/admin/delete}" method="post">
                     <input type="hidden" name="id" th:value="${user.getId()}">
@@ -53,8 +55,6 @@
 
                 <form action="#" th:action="@{/admin/update}" method="get">
                     <input type="hidden" name="id" th:value="${user.getId()}">
-                    <input type="hidden" name="name" th:value="${user.getUsername()}">
-                    <input type="hidden" name="pass" th:value="${user.getPassword()}">
                     <input class="butt" type="submit" value="Change">
                 </form>
             </span>
@@ -68,6 +68,10 @@
                     <br>
                     <p>Password: <input type="text" th:field="*{password}"/></p>
                     <br>
+                    <p>New Role</p><select name="role">
+                        <option value="1">Admin</option>
+                        <option value="2">User</option>
+                    </select>
                     <button type="submit">Add me</button>
                 </span>
             </form>

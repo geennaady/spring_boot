@@ -11,8 +11,12 @@
             <form action="#" th:action="@{/admin/update} "method="post">
                 <p>Change User</p>
                 <input type="hidden" name="id" th:value="${param.id}">
-                <p>New Name</p><input type="text" name="username" th:value="${param.username}" th:placeholder="${param.name}">
-                <p>New Pass</p><input type="text" name="password" th:value="${param.password}" th:placeholder="${param.pass}">
+                <p>New Name</p><input type="text" name="username" th:value="${param.username}" >
+                <p>New Pass</p><input type="text" name="password" th:value="${param.password}" >
+                <p>New Role</p><select name="role">
+                    <option value="1">Admin</option>
+                    <option value="2">User</option>
+                </select>
                 <input class="butt" type="submit" value="Change">
             </form>
         </span>

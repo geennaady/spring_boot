@@ -1,6 +1,7 @@
 package web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import web.model.User;
+import web.service.RoleService;
 import web.service.UserService;
 
 import java.util.List;
@@ -17,6 +19,12 @@ import java.util.List;
 public class AdminController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptEncoder;
 
     @RequestMapping(value = "admin", method = RequestMethod.GET)
     public String printWelcome(ModelMap model) {
@@ -30,18 +38,16 @@ public class AdminController {
     }
 
     @RequestMapping(value = "admin/add", method = RequestMethod.POST)
-    public ModelAndView saveUser(@ModelAttribute User user) {
+    public ModelAndView saveUser(@ModelAttribute User user, @RequestParam Long role) {
         ModelAndView model = null;
-        boolean flag = true;
 
         if (user.getUsername().isEmpty() || user.getPassword().isEmpty()) {
             model = new ModelAndView("redirect:/admin/error");
             model.addObject("message", "Enter the name or pass");
-            flag = false;
-        }
-
-        if(flag) {
+        } else {
             try {
+                user.setRoles(roleService.getAuthorityById(role));
+                user.setPassword(bCryptEncoder.encode(user.getPassword()));
                 userService.addUser(user);
                 model = new ModelAndView("redirect:/admin");
             } catch (Exception e) {
@@ -73,26 +79,29 @@ public class AdminController {
     }
 
     @RequestMapping(value = "admin/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(@ModelAttribute User user) {
+    public ModelAndView updateUser(@ModelAttribute User user, @RequestParam Long role) {
         ModelAndView model = null;
-        boolean flag = true;
 
         if (user.getUsername().isEmpty()) {
-            model = new ModelAndView("redirect:/admin/error");
-            model.addObject("message", "Enter the name");
-            flag = false;
+            User userForOldName = (User) userService.getUserById(user.getId());
+            user.setUsername(userForOldName.getUsername());
         }
 
         if(user.getPassword().isEmpty()) {
             User userForPass = (User) userService.getUserById(user.getId());
             user.setPassword(userForPass.getPassword());
+        } else {
+            user.setPassword(bCryptEncoder.encode(user.getPassword()));
         }
 
-        if(flag) {
+        try {
+            user.setRoles(roleService.getAuthorityById(role));
             userService.updateUser(user);
             model = new ModelAndView("redirect:/admin");
+        } catch (Exception e) {
+            model = new ModelAndView("redirect:/admin/error");
+            model.addObject("message", "Name already exists");
         }
-
 
         return model;
     }
