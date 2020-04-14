@@ -8,11 +8,5 @@ import java.util.Set;
 
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
-    default Set getAuthorityById(Long id) {
-        Set<Role> userRole = new HashSet<>();
-        Role role = getOne(id);
-        userRole.add(role);
-
-        return userRole;
-    }
+        Set<Role> getAuthorityById(Long id);
 }
